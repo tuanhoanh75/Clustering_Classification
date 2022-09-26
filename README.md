@@ -20,11 +20,13 @@
 
 ---
 
+## Beginn
+
 ### Gruppierung von nFK-Jahresvberläufen mittels Clustering-Skript:
 
 1. Die benötigten Libraries einladen **(Zeile 2-19)**
 2. Voreinstellungen für die spätere Plot-Erstellung ausführen -> hier individuell adjustierbar **(Zeile 22-24)**
-3. Entsprechende Arbeitsverzeichnisse erstellen, falls noch nicht verhanden (**Zeile 30-57)**
+3. Entsprechende Arbeitsverzeichnisse erstellen, falls noch nicht vorhanden (**Zeile 30-57)**
    - Achte hierbei auf die Bezeichungen der Arbeitverzeichnisse -> Es wird ein "working_dir\raw_data"-Verzeichnis benötigt, indem die Rohdaten abgelegt werden
    - Das "done"-Verzeichnis wird im Prinzip nicht benötigt, aber kann mit erstellt werden, wenn bspw. gewollt ist, dass die aufbereiteten Daten als csv-Datei exportiert wird (evtl. kurze Sichtprüfung der Daten, ob diese korrekt transformiert wurden, dazu später mehr)
 5. Rohdaten aufbereiten, dazu zählen Zeitreihenlänge von 366 auf 365 Tage vereinheitlichen, überflüssige Metainformation aussschließen etc. **(Zeile 61-151)**
@@ -43,16 +45,38 @@
       - "n_jobs": Bei '-1' heißt eine Parallisierung der Berechung bei "dtw" -> ist optional bzw. Param kann entfernt werden
 12. Wenn Clusterberchung abgeschlossen ist, dann die Cluster-Labels dem vorher erstellen Date Frame in Zeile 171 den jeweiligen nFk-Jahresvberlauf zuordnen **(Zeile 224)**
 13. Export der Ergebnisse als hdf5 File **(Zeile 228)** bzw. falls eine kurze Sichtprüfung gewünscht auch als csv-Datei (**Zeile 229)**
-14. Finaler Schritt ist das PLotten der Clusterergebnisse (Zeile 247 - 274)
+14. Finaler Schritt ist das PLotten der Clusterergebnisse **(Zeile 247 - 274)**
     - Achtung: Wenn die Clusteranzahl in Zeile 207 höher oder neideriger gewählt sein sollte, dann ensprechende die Anzahl an Subplots in Zeile 248 adjustieren 
       - 1. Bsp.: n_cluster = 80 -> plot_count = 9 (es werden 81 (9x9) Subplots für die Clusterergbnisse erstellt) 
       - 2. Bsp.: n_cluster = 120 -> plot_count = 11 (121 Subplots) usw.
     - Der Plot kann dann genutzt werden, um die neuen klassifizerten Input-Daten (Classification_scipt.py), mit den aus dem Plot erstellten Referenzverläufen (rot) abzugleichen
 
+
+## End
+
 ---
 
-### Klassifizerung von neuen unekannten nFK-Jahresverläufen mittels Classification_script.py:
+## Beginn
 
+### Klassifizerung von neuen unbekannte nFK-Jahresverläufen mittels Classification_script.py:
 
+1. Die benötigten Libraries einladen **(Zeile 2-12)**
+2. Import der geclusterten Daten (Zeile 16-17) -> Wird für das trainieren/ lernen des Modells benötigt
+3. Entsprechende Arbeitsverzeichnisse anlegen, falls noch nicht vorhanden **(Zeile 21-58)**
+   - Arbeitsverzeichnis soll wie folgt aussehen: "working_dir\input_data" (dort die neuen Input-Daten ablegen)
+5. Neue Input-Rohdaten aufbereiten, dazu zählen Zeitreihenlänge von 366 auf 365 Tage vereinheitlichen, überflüssige Metainformation aussschließen etc. **(Zeile 62-152)**
+6. Als nächstes jede Zeitreihe vom Typ "data frame" zum Typ "Series" umkonvertieren **(Zeile 157-162)**
+7. Spalte "year"  und Data Frame erstrellen, worin die die neuen Input-Daten gespeichert werden **(Zeile 165-171)**
+8. Splitung der zuvor eingeladenen geclustered Daten in zwei Variablen **(Zeile 175-181)** und aufsplittung der Daten in Lerndaten und Testdaten **(Zeile 183-184)**
+   - Die Splitratio (Lerndaten und Testdaten) kann beliebig gewählt werden (Faustformel 60:Lerndaten/ 40:Testdaten)
+9. Einführung einer neuen Variable, welcher die neuen Input-Daten und dessen Typ von 'Series' zu 'Data Frame' umwandelt **(Zeile 188-191)** 
+10. Start des Lernens/ Trainings des Klassiifzierungsmodells mitt den geclusterten Daten **(Zeile 218-221)**
+    - Tuning-Parameter **(Zeile 221)**: 
+      - "n_estimator": Gibt die Anzahl der zu erstellenden Schätzer für das Ensemble-Baum -> adjustierbar 
+      - Optional kann mittels Accuracy Score die Klassifikationsgenauigkeit ermittelt werden (Zeile 227) -> ggf. print(forest_score) ergänzen
+11. Klassifizierung von neuen unbekannten nFK-Verläufen **(Zeile 231-232)**
+12. Zurordnung der Labels der klassifizierten Objekt zu dem vorher erstellen Data frame in Zeile 171 **(Zeile 234-235)**
+13. Export der klassifizierten Objekten als hdf5 File **(Zeile 237-239)** oder zur kruzen Sichtprüfung als csv-Datei **(Zeile 240)** 
+14. Final können die neu klassifierten Objekte mit dem Referenzverlauf (Plot) aus dem Clustering_script.py abgeglichen werden, um ein Bild zu bekommen, wie der Verlauf aussieht
 
-
+## End
